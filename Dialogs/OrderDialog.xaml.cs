@@ -1,67 +1,42 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Controls;
 using CafeOrderManager.Models;
 using CafeOrderManager.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace CafeOrderManager
 {
-    public partial class OrderDialog : Window, INotifyPropertyChanged
+    public partial class OrderDialog : Window
     {
         private readonly DatabaseContext _context;
-        private decimal _totalAmount;
-
         public Order Order { get; private set; }
-        public ObservableCollection<OrderItem> OrderItems { get; set; }
-
-        public decimal TotalAmount
-        {
-            get => _totalAmount;
-            private set
-            {
-                if (_totalAmount != value)
-                {
-                    _totalAmount = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        private ObservableCollection<OrderItem> _orderItems;
 
         public OrderDialog(DatabaseContext context)
         {
             InitializeComponent();
             _context = context;
-            Order = new Order
-            {
-                OrderDate = DateTime.Now,
-                Status = "Новый"
-            };
-            OrderItems = new ObservableCollection<OrderItem>();
-            OrderItems.CollectionChanged += OrderItems_CollectionChanged;
-            OrderItemsGrid.ItemsSource = OrderItems;
+            Order = new Order { OrderDate = DateTime.Now, Status = "Новый" };
+            _orderItems = new ObservableCollection<OrderItem>();
+            OrderItemsListView.ItemsSource = _orderItems;
             LoadMenuItems();
             DataContext = this;
-        }
-
-        private void OrderItems_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            UpdateTotalAmount();
-        }
-
-        private void UpdateTotalAmount()
-        {
-            TotalAmount = OrderItems.Sum(item => item.Total);
         }
 
         private void LoadMenuItems()
         {
             try
             {
-                var menuItems = _context.MenuDishes.Where(m => m.IsAvailable).ToList();
-                MenuItemsComboBox.ItemsSource = menuItems;
+                var menuItems = _context.MenuDishes
+                    .Where(m => m.IsAvailable)
+                    .OrderBy(m => m.Category)
+                    .ThenBy(m => m.Name)
+                    .ToList();
+                MenuItemsListView.ItemsSource = menuItems;
             }
             catch (Exception ex)
             {
@@ -69,52 +44,51 @@ namespace CafeOrderManager
             }
         }
 
-        private void AddToOrder_Click(object sender, RoutedEventArgs e)
+        private void AddToOrderButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MenuItemsComboBox.SelectedItem is MenuDish selectedDish)
+            if (MenuItemsListView.SelectedItem is MenuDish selectedDish)
             {
-                if (int.TryParse(QuantityTextBox.Text, out int quantity) && quantity > 0)
+                var existingItem = _orderItems.FirstOrDefault(item => item.MenuDish.Id == selectedDish.Id);
+                if (existingItem != null)
                 {
-                    var existingItem = OrderItems.FirstOrDefault(item => item.MenuDish.Id == selectedDish.Id);
-                    if (existingItem != null)
-                    {
-                        existingItem.Quantity += quantity;
-                        OrderItemsGrid.Items.Refresh();
-                        UpdateTotalAmount();
-                    }
-                    else
-                    {
-                        var orderItem = new OrderItem
-                        {
-                            MenuDish = selectedDish,
-                            MenuDishId = selectedDish.Id,
-                            Quantity = quantity,
-                            Price = selectedDish.Price
-                        };
-                        OrderItems.Add(orderItem);
-                    }
-                    
-                    // Reset inputs
-                    MenuItemsComboBox.SelectedItem = null;
-                    QuantityTextBox.Text = "1";
+                    existingItem.Quantity++;
+                    existingItem.Price = existingItem.Quantity * selectedDish.Price;
                 }
                 else
                 {
-                    MessageBox.Show("Пожалуйста, введите корректное количество", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    var orderItem = new OrderItem
+                    {
+                        MenuDish = selectedDish,
+                        MenuDishId = selectedDish.Id,
+                        Quantity = 1,
+                        Price = selectedDish.Price
+                    };
+                    _orderItems.Add(orderItem);
                 }
-            }
-            else
-            {
-                MessageBox.Show("Пожалуйста, выберите блюдо", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                UpdateTotalAmount();
             }
         }
 
-        private void RemoveItem_Click(object sender, RoutedEventArgs e)
+        private void RemoveFromOrderButton_Click(object sender, RoutedEventArgs e)
         {
-            if (OrderItemsGrid.SelectedItem is OrderItem selectedItem)
+            if (OrderItemsListView.SelectedItem is OrderItem selectedItem)
             {
-                OrderItems.Remove(selectedItem);
+                if (selectedItem.Quantity > 1)
+                {
+                    selectedItem.Quantity--;
+                    selectedItem.Price = selectedItem.Quantity * selectedItem.MenuDish.Price;
+                }
+                else
+                {
+                    _orderItems.Remove(selectedItem);
+                }
+                UpdateTotalAmount();
             }
+        }
+
+        private void UpdateTotalAmount()
+        {
+            Order.TotalAmount = _orderItems.Sum(item => item.Price);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -123,25 +97,21 @@ namespace CafeOrderManager
             Close();
         }
 
-        private void CreateOrderButton_Click(object sender, RoutedEventArgs e)
+        private void CreateButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!OrderItems.Any())
+            if (!_orderItems.Any())
             {
-                MessageBox.Show("Добавьте хотя бы одно блюдо в заказ", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Добавьте хотя бы одно блюдо в заказ", "Предупреждение", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            Order.OrderItems = OrderItems.ToList();
-            Order.TotalAmount = TotalAmount;
+            Order.OrderItems = new List<OrderItem>(_orderItems);
+            foreach (var item in Order.OrderItems)
+            {
+                item.OrderId = Order.Id;
+            }
             DialogResult = true;
             Close();
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

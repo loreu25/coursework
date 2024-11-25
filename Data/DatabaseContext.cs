@@ -13,12 +13,18 @@ namespace CafeOrderManager.Data
 
         public DatabaseContext()
         {
-            Database.EnsureCreated(); // Only create if doesn't exist
+            string dbDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CafeOrderManager");
+            if (!Directory.Exists(dbDirectory))
+            {
+                Directory.CreateDirectory(dbDirectory);
+            }
+            Database.EnsureCreated();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CafeDB.db");
+            string dbDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CafeOrderManager");
+            string dbPath = Path.Combine(dbDirectory, "CafeDB.db");
             optionsBuilder.UseSqlite($"Data Source={dbPath}");
         }
 
@@ -67,23 +73,23 @@ namespace CafeOrderManager.Data
                 // Закуски
                 new MenuDish { Id = 16, Name = "Брускетта с лососем", Description = "Хрустящий багет с лососем и сливочным сыром", Price = 450m, Category = "Закуски", IsAvailable = true },
                 new MenuDish { Id = 17, Name = "Карпаччо из говядины", Description = "Тонко нарезанная говядина с рукколой", Price = 750m, Category = "Закуски", IsAvailable = true },
-                new MenuDish { Id = 18, Name = "Креветки в кляре", Description = "Хрустящие креветки с соусом тартар", Price = 650m, Category = "Закуски", IsAvailable = true },
-                new MenuDish { Id = 19, Name = "Сырная тарелка", Description = "Ассорти из пяти видов сыра", Price = 950m, Category = "Закуски", IsAvailable = true },
-                new MenuDish { Id = 20, Name = "Мясное ассорти", Description = "Нарезка из различных видов мяса", Price = 1200m, Category = "Закуски", IsAvailable = true },
-                
+                new MenuDish { Id = 18, Name = "Тартар из тунца", Description = "Свежий тунец с авокадо", Price = 850m, Category = "Закуски", IsAvailable = true },
+                new MenuDish { Id = 19, Name = "Сырная тарелка", Description = "Ассорти из 5 видов сыра", Price = 950m, Category = "Закуски", IsAvailable = true },
+                new MenuDish { Id = 20, Name = "Мясное ассорти", Description = "Подборка мясных деликатесов", Price = 1200m, Category = "Закуски", IsAvailable = true },
+
                 // Десерты
                 new MenuDish { Id = 21, Name = "Тирамису", Description = "Классический итальянский десерт", Price = 400m, Category = "Десерты", IsAvailable = true },
                 new MenuDish { Id = 22, Name = "Чизкейк", Description = "Нью-Йоркский чизкейк", Price = 450m, Category = "Десерты", IsAvailable = true },
                 new MenuDish { Id = 23, Name = "Шоколадный фондан", Description = "С шариком ванильного мороженого", Price = 500m, Category = "Десерты", IsAvailable = true },
-                new MenuDish { Id = 24, Name = "Панна котта", Description = "С малиновым соусом", Price = 400m, Category = "Десерты", IsAvailable = true },
-                new MenuDish { Id = 25, Name = "Фруктовая тарелка", Description = "Ассорти из сезонных фруктов", Price = 600m, Category = "Десерты", IsAvailable = true },
-                
+                new MenuDish { Id = 24, Name = "Панна-котта", Description = "С ягодным соусом", Price = 400m, Category = "Десерты", IsAvailable = true },
+                new MenuDish { Id = 25, Name = "Фруктовая тарелка", Description = "Сезонные фрукты", Price = 600m, Category = "Десерты", IsAvailable = true },
+
                 // Напитки
-                new MenuDish { Id = 26, Name = "Эспрессо", Description = "Классический итальянский кофе", Price = 150m, Category = "Напитки", IsAvailable = true },
+                new MenuDish { Id = 26, Name = "Эспрессо", Description = "Классический кофе", Price = 150m, Category = "Напитки", IsAvailable = true },
                 new MenuDish { Id = 27, Name = "Капучино", Description = "С молочной пенкой", Price = 200m, Category = "Напитки", IsAvailable = true },
-                new MenuDish { Id = 28, Name = "Свежевыжатый апельсиновый сок", Description = "200 мл", Price = 250m, Category = "Напитки", IsAvailable = true },
-                new MenuDish { Id = 29, Name = "Зеленый чай", Description = "С жасмином", Price = 150m, Category = "Напитки", IsAvailable = true },
-                new MenuDish { Id = 30, Name = "Лимонад домашний", Description = "С мятой и лаймом", Price = 200m, Category = "Напитки", IsAvailable = true }
+                new MenuDish { Id = 28, Name = "Свежевыжатый сок", Description = "Апельсин/яблоко/морковь", Price = 300m, Category = "Напитки", IsAvailable = true },
+                new MenuDish { Id = 29, Name = "Зеленый чай", Description = "Китайский высокогорный", Price = 250m, Category = "Напитки", IsAvailable = true },
+                new MenuDish { Id = 30, Name = "Лимонад", Description = "Домашний лимонад", Price = 300m, Category = "Напитки", IsAvailable = true }
             };
 
             modelBuilder.Entity<MenuDish>().HasData(menuItems);

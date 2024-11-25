@@ -5,9 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Новый заказ" Height="600" Width="800"
-        WindowStartupLocation="CenterOwner">
-
+        Title="Создать заказ" 
+        Height="600" 
+        Width="800"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource MaterialDesignPaper}"
+        Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto">
+    
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,83 +25,87 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
         <!-- Меню -->
-        <GroupBox Grid.Row="0" Header="Добавить блюдо" Margin="0,0,0,16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <ComboBox x:Name="MenuItemsComboBox"
-                         materialDesign:HintAssist.Hint="Выберите блюдо"
-                         Style="{StaticResource MaterialDesignFloatingHintComboBox}"
-                         DisplayMemberPath="Name"
-                         Margin="0,8,8,0"/>
-
-                <TextBox x:Name="QuantityTextBox"
-                        Grid.Column="1"
-                        materialDesign:HintAssist.Hint="Количество"
-                        Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                        Width="100"
-                        Margin="0,8,8,0"
-                        Text="1"/>
-
-                <Button Grid.Column="2"
-                        Content="Добавить"
-                        Style="{StaticResource MaterialDesignRaisedButton}"
-                        Click="AddToOrder_Click"
-                        Margin="0,8,0,0"/>
-            </Grid>
+        <GroupBox Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+                  Header="Меню"
+                  Style="{StaticResource MaterialDesignGroupBox}"
+                  materialDesign:ColorZoneAssist.Mode="PrimaryLight"
+                  Margin="0,0,8,0">
+            <ListView x:Name="MenuItemsListView" 
+                      SelectionMode="Single">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Название" 
+                                      DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="Цена" 
+                                      DisplayMemberBinding="{Binding Price, StringFormat={}{0:N0} ₽}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </GroupBox>
 
-        <!-- Список блюд в заказе -->
-        <DataGrid Grid.Row="1" 
-                  x:Name="OrderItemsGrid"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  IsReadOnly="True"
-                  Margin="0,0,0,16">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Название" Binding="{Binding MenuDish.Name}" Width="*"/>
-                <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="Auto"/>
-                <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="Auto"/>
-                <DataGridTextColumn Header="Сумма" Binding="{Binding Total}" Width="Auto"/>
-                <DataGridTemplateColumn Width="Auto">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                    Command="{Binding DataContext.RemoveItemCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                    CommandParameter="{Binding}"
-                                    Click="RemoveItem_Click">
-                                <materialDesign:PackIcon Kind="Delete"/>
-                            </Button>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-            </DataGrid.Columns>
-        </DataGrid>
+        <!-- Кнопки управления -->
+        <StackPanel Grid.Row="1" Grid.Column="1" 
+                    VerticalAlignment="Center"
+                    Margin="8">
+            <Button x:Name="AddToOrderButton"
+                    Click="AddToOrderButton_Click"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
+                    Margin="0,0,0,8">
+                <materialDesign:PackIcon Kind="ArrowRight"/>
+            </Button>
+            <Button x:Name="RemoveFromOrderButton"
+                    Click="RemoveFromOrderButton_Click"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}">
+                <materialDesign:PackIcon Kind="ArrowLeft"/>
+            </Button>
+        </StackPanel>
 
-        <!-- Итоговая сумма -->
-        <TextBlock Grid.Row="2" 
-                   Text="{Binding TotalAmount, StringFormat={}Итого: {0:C}}"
+        <!-- Заказ -->
+        <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                  Header="Заказ"
+                  Style="{StaticResource MaterialDesignGroupBox}"
+                  materialDesign:ColorZoneAssist.Mode="PrimaryLight"
+                  Margin="8,0,0,0">
+            <ListView x:Name="OrderItemsListView"
+                      SelectionMode="Single">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Название" 
+                                      DisplayMemberBinding="{Binding MenuDish.Name}"/>
+                        <GridViewColumn Header="Кол-во" 
+                                      DisplayMemberBinding="{Binding Quantity}"/>
+                        <GridViewColumn Header="Цена" 
+                                      DisplayMemberBinding="{Binding Price, StringFormat={}{0:N0} ₽}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+
+        <!-- Итого -->
+        <TextBlock Grid.Row="2" Grid.Column="2"
+                   Text="{Binding Order.TotalAmount, StringFormat=Итого: {0:N0} ₽}"
+                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"
                    HorizontalAlignment="Right"
-                   FontSize="18"
-                   FontWeight="Bold"
-                   Margin="0,0,0,16"/>
+                   Margin="0,16,0,16"/>
 
-        <!-- Кнопки -->
-        <StackPanel Grid.Row="3" 
+        <!-- Кнопки действий -->
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right">
             <Button Content="Отмена"
-                    Style="{StaticResource MaterialDesignFlatButton}"
                     Click="CancelButton_Click"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
                     Margin="0,0,8,0"/>
-            <Button Content="Создать заказ"
-                    Style="{StaticResource MaterialDesignRaisedButton}"
-                    Click="CreateOrderButton_Click"/>
+            <Button Content="Создать"
+                    Click="CreateButton_Click"
+                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"/>
         </StackPanel>
     </Grid>
 </Window>

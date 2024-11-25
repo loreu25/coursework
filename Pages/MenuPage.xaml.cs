@@ -6,8 +6,9 @@ using System.Linq;
 using CafeOrderManager.Models;
 using CafeOrderManager.Data;
 using Microsoft.EntityFrameworkCore;
+using MaterialDesignThemes.Wpf;
 
-namespace CafeOrderManager
+namespace CafeOrderManager.Pages
 {
     public partial class MenuPage : Page
     {
@@ -17,23 +18,19 @@ namespace CafeOrderManager
         public MenuPage()
         {
             InitializeComponent();
-            try
-            {
-                _context = new DatabaseContext();
-                LoadMenuItems();
-                DataContext = this;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка при инициализации базы данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            _context = new DatabaseContext();
+            LoadMenuItems();
+            DataContext = this;
         }
 
         private void LoadMenuItems()
         {
             try
             {
-                var items = _context.MenuDishes.ToList();
+                var items = _context.MenuDishes
+                    .OrderBy(m => m.Category)
+                    .ThenBy(m => m.Name)
+                    .ToList();
                 MenuItems = new ObservableCollection<MenuDish>(items);
                 MenuItemsListView.ItemsSource = MenuItems;
             }
@@ -43,17 +40,145 @@ namespace CafeOrderManager
             }
         }
 
-        private async void AddMenuItem_Click(object sender, RoutedEventArgs e)
+        private bool ShowMenuItemDialog(MenuDish menuItem, string title)
         {
-            var dialog = new MenuItemDialog();
-            if (dialog.ShowDialog() == true)
+            var dialog = new Window
+            {
+                Title = title,
+                Width = 400,
+                Height = 500,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this),
+                Background = (System.Windows.Media.Brush)FindResource("MaterialDesignPaper"),
+                Foreground = (System.Windows.Media.Brush)FindResource("MaterialDesignBody")
+            };
+
+            var grid = new Grid { Margin = new Thickness(16) };
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            var nameBox = new TextBox
+            {
+                Text = menuItem.Name,
+                Margin = new Thickness(0, 0, 0, 8),
+                Style = (Style)FindResource("MaterialDesignOutlinedTextBox")
+            };
+            HintAssist.SetHint(nameBox, "Название");
+            Grid.SetRow(nameBox, 0);
+
+            var descriptionBox = new TextBox
+            {
+                Text = menuItem.Description,
+                Margin = new Thickness(0, 0, 0, 8),
+                Style = (Style)FindResource("MaterialDesignOutlinedTextBox")
+            };
+            HintAssist.SetHint(descriptionBox, "Описание");
+            Grid.SetRow(descriptionBox, 1);
+
+            var priceBox = new TextBox
+            {
+                Text = menuItem.Price.ToString(),
+                Margin = new Thickness(0, 0, 0, 8),
+                Style = (Style)FindResource("MaterialDesignOutlinedTextBox")
+            };
+            HintAssist.SetHint(priceBox, "Цена");
+            Grid.SetRow(priceBox, 2);
+
+            var categoryBox = new TextBox
+            {
+                Text = menuItem.Category,
+                Margin = new Thickness(0, 0, 0, 8),
+                Style = (Style)FindResource("MaterialDesignOutlinedTextBox")
+            };
+            HintAssist.SetHint(categoryBox, "Категория");
+            Grid.SetRow(categoryBox, 3);
+
+            var availableBox = new CheckBox
+            {
+                Content = "Доступно",
+                IsChecked = menuItem.IsAvailable,
+                Margin = new Thickness(0, 8, 0, 16),
+                Style = (Style)FindResource("MaterialDesignCheckBox")
+            };
+            Grid.SetRow(availableBox, 4);
+
+            var buttonPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+            Grid.SetRow(buttonPanel, 5);
+
+            var saveButton = new Button
+            {
+                Content = "Сохранить",
+                Style = (Style)FindResource("MaterialDesignRaisedSecondaryButton"),
+                Margin = new Thickness(0, 0, 8, 0)
+            };
+            saveButton.Click += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(nameBox.Text))
+                {
+                    MessageBox.Show("Введите название блюда", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (!decimal.TryParse(priceBox.Text, out decimal price) || price <= 0)
+                {
+                    MessageBox.Show("Введите корректную цену", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                menuItem.Name = nameBox.Text;
+                menuItem.Description = descriptionBox.Text;
+                menuItem.Price = price;
+                menuItem.Category = categoryBox.Text;
+                menuItem.IsAvailable = availableBox.IsChecked ?? false;
+
+                dialog.DialogResult = true;
+                dialog.Close();
+            };
+
+            var cancelButton = new Button
+            {
+                Content = "Отмена",
+                Style = (Style)FindResource("MaterialDesignFlatButton")
+            };
+            cancelButton.Click += (s, e) =>
+            {
+                dialog.DialogResult = false;
+                dialog.Close();
+            };
+
+            buttonPanel.Children.Add(cancelButton);
+            buttonPanel.Children.Add(saveButton);
+
+            grid.Children.Add(nameBox);
+            grid.Children.Add(descriptionBox);
+            grid.Children.Add(priceBox);
+            grid.Children.Add(categoryBox);
+            grid.Children.Add(availableBox);
+            grid.Children.Add(buttonPanel);
+
+            dialog.Content = grid;
+
+            return dialog.ShowDialog() ?? false;
+        }
+
+        private void AddMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = new MenuDish { IsAvailable = true };
+            if (ShowMenuItemDialog(menuItem, "Добавление блюда"))
             {
                 try
                 {
-                    var newItem = dialog.MenuDish;
-                    _context.MenuDishes.Add(newItem);
-                    await _context.SaveChangesAsync();
-                    LoadMenuItems();
+                    _context.MenuDishes.Add(menuItem);
+                    _context.SaveChanges();
+                    MenuItems.Add(menuItem);
                 }
                 catch (Exception ex)
                 {
@@ -62,48 +187,58 @@ namespace CafeOrderManager
             }
         }
 
-        private async void EditMenuItem_Click(object sender, RoutedEventArgs e)
+        private void EditMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement element && element.DataContext is MenuDish menuItem)
+            if (MenuItemsListView.SelectedItem is MenuDish selectedItem)
             {
-                var dialog = new MenuItemDialog(menuItem);
-                if (dialog.ShowDialog() == true)
+                var menuItem = new MenuDish
+                {
+                    Id = selectedItem.Id,
+                    Name = selectedItem.Name,
+                    Description = selectedItem.Description,
+                    Price = selectedItem.Price,
+                    Category = selectedItem.Category,
+                    IsAvailable = selectedItem.IsAvailable
+                };
+
+                if (ShowMenuItemDialog(menuItem, "Редактирование блюда"))
                 {
                     try
                     {
-                        var updatedItem = dialog.MenuDish;
-                        var existingItem = await _context.MenuDishes.FindAsync(updatedItem.Id);
-                        if (existingItem != null)
-                        {
-                            _context.Entry(existingItem).CurrentValues.SetValues(updatedItem);
-                            await _context.SaveChangesAsync();
-                            LoadMenuItems();
-                        }
+                        selectedItem.Name = menuItem.Name;
+                        selectedItem.Description = menuItem.Description;
+                        selectedItem.Price = menuItem.Price;
+                        selectedItem.Category = menuItem.Category;
+                        selectedItem.IsAvailable = menuItem.IsAvailable;
+
+                        _context.SaveChanges();
+                        MenuItemsListView.Items.Refresh();
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show($"Ошибка при редактировании блюда: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show($"Ошибка при обновлении блюда: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
             }
         }
 
-        private async void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
+        private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is FrameworkElement element && element.DataContext is MenuDish menuItem)
+            if (MenuItemsListView.SelectedItem is MenuDish selectedItem)
             {
-                if (MessageBox.Show("Вы уверены, что хотите удалить это блюдо?", "Подтверждение",
-                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                var result = MessageBox.Show(
+                    "Вы уверены, что хотите удалить это блюдо?",
+                    "Подтверждение удаления",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
                 {
                     try
                     {
-                        var itemToDelete = await _context.MenuDishes.FindAsync(menuItem.Id);
-                        if (itemToDelete != null)
-                        {
-                            _context.MenuDishes.Remove(itemToDelete);
-                            await _context.SaveChangesAsync();
-                            LoadMenuItems();
-                        }
+                        _context.MenuDishes.Remove(selectedItem);
+                        _context.SaveChanges();
+                        MenuItems.Remove(selectedItem);
                     }
                     catch (Exception ex)
                     {

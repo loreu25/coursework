@@ -11,7 +11,8 @@
         Background="{DynamicResource MaterialDesignPaper}"
         TextElement.FontWeight="Medium"
         TextElement.FontSize="14"
-        FontFamily="{materialDesign:MaterialDesignFont}">
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
@@ -27,16 +28,26 @@
         </Grid.RowDefinitions>
 
         <!-- Top Navigation -->
-        <materialDesign:ColorZone Mode="PrimaryMid" Padding="16" materialDesign:ShadowAssist.ShadowDepth="Depth2">
-            <DockPanel>
-                <TextBlock Text="Cafe Order Manager" Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
-                           VerticalAlignment="Center"/>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="Меню" Click="MenuButton_Click"/>
-                    <Button Content="Заказы" Click="OrdersButton_Click"/>
-                </StackPanel>
-            </DockPanel>
-        </materialDesign:ColorZone>
+        <StackPanel Orientation="Horizontal" 
+                    Background="{DynamicResource MaterialDesignPaper}"
+                    Margin="16">
+            <TextBlock Text="Cafe Order Manager" Style="{StaticResource MaterialDesignHeadline6TextBlock}" 
+                       VerticalAlignment="Center"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="Меню" Click="MenuButton_Click"/>
+                <Button Content="Заказы" Click="OrdersButton_Click"/>
+            </StackPanel>
+            <!-- Кнопка переключения темы -->
+            <ToggleButton x:Name="ThemeToggle"
+                         Style="{StaticResource MaterialDesignSwitchToggleButton}"
+                         ToolTip="Переключить тему"
+                         IsChecked="True"
+                         Click="ThemeToggle_Click"
+                         Margin="16,0,0,0"/>
+            <TextBlock Text="Тёмная тема" 
+                       VerticalAlignment="Center"
+                       Margin="8,0,0,0"/>
+        </StackPanel>
 
         <!-- Main Content -->
         <Frame x:Name="MainFrame" Grid.Row="1" NavigationUIVisibility="Hidden"/>

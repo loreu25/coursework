@@ -6,7 +6,7 @@ using CafeOrderManager.Models;
 using CafeOrderManager.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace CafeOrderManager
+namespace CafeOrderManager.Pages
 {
     public partial class OrdersPage : Page
     {
@@ -62,13 +62,13 @@ namespace CafeOrderManager
             if (sender is FrameworkElement element && element.DataContext is Order order)
             {
                 var details = string.Join("\n", order.OrderItems.Select(item => 
-                    $"{item.MenuDish.Name} x{item.Quantity} = {item.Price * item.Quantity:C}"));
+                    $"{item.MenuDish.Name} x{item.Quantity} = {item.Price * item.Quantity:N0} ₽"));
                 
                 var message = $"Заказ №{order.Id}\n" +
                              $"Дата: {order.OrderDate:dd.MM.yyyy HH:mm}\n" +
                              $"Статус: {order.Status}\n\n" +
                              $"Позиции:\n{details}\n\n" +
-                             $"Итого: {order.TotalAmount:C}";
+                             $"Итого: {order.TotalAmount:N0} ₽";
                 
                 MessageBox.Show(message, "Детали заказа", MessageBoxButton.OK, MessageBoxImage.Information);
             }
