@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,17 +11,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CafeOrderManager
 {
-    public partial class OrderDialog : Window
+    public partial class OrderDialog : Window, INotifyPropertyChanged
     {
         private readonly DatabaseContext _context;
-        public Order Order { get; private set; }
+        private Order _order;
         private ObservableCollection<OrderItem> _orderItems;
+        public decimal TotalAmount { get; private set; }
+
+        public Order Order => _order;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public OrderDialog(DatabaseContext context)
         {
             InitializeComponent();
             _context = context;
-            Order = new Order { OrderDate = DateTime.Now, Status = "Новый" };
+            _order = new Order { OrderDate = DateTime.Now, Status = "Новый" };
             _orderItems = new ObservableCollection<OrderItem>();
             OrderItemsListView.ItemsSource = _orderItems;
             LoadMenuItems();
@@ -88,7 +99,8 @@ namespace CafeOrderManager
 
         private void UpdateTotalAmount()
         {
-            Order.TotalAmount = _orderItems.Sum(item => item.Price);
+            TotalAmount = _orderItems.Sum(item => item.Price);
+            OnPropertyChanged(nameof(TotalAmount));
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -105,11 +117,13 @@ namespace CafeOrderManager
                 return;
             }
 
-            Order.OrderItems = new List<OrderItem>(_orderItems);
-            foreach (var item in Order.OrderItems)
+            _order.OrderItems = _orderItems.ToList();
+            _order.TotalAmount = TotalAmount;
+            foreach (var item in _order.OrderItems)
             {
-                item.OrderId = Order.Id;
+                item.OrderId = _order.Id;
             }
+
             DialogResult = true;
             Close();
         }

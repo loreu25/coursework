@@ -16,7 +16,7 @@
 
         <!-- Верхняя панель с кнопкой добавления -->
         <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
-            <Button Content="Новый заказ" 
+            <Button Content="Создать заказ" 
                     Click="AddOrder_Click"
                     Style="{StaticResource MaterialDesignRaisedButton}"/>
         </StackPanel>
@@ -26,18 +26,26 @@
                   ItemsSource="{Binding Orders}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Номер" 
+                    <GridViewColumn Header="№" 
                                   DisplayMemberBinding="{Binding Id}" 
-                                  Width="100"/>
-                    <GridViewColumn Header="Дата" 
-                                  DisplayMemberBinding="{Binding OrderDate, StringFormat={}{0:dd.MM.yyyy HH:mm}}" 
-                                  Width="150"/>
+                                  Width="50"/>
+                    <GridViewColumn Header="Дата" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding OrderDate, StringFormat=dd.MM.yyyy HH:mm}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Статус" 
                                   DisplayMemberBinding="{Binding Status}" 
-                                  Width="150"/>
-                    <GridViewColumn Header="Сумма" 
-                                  DisplayMemberBinding="{Binding TotalAmount, StringFormat={}{0:C}}" 
                                   Width="100"/>
+                    <GridViewColumn Header="Сумма" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:N0} ₽}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Действия" Width="200">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

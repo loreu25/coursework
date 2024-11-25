@@ -1,6 +1,9 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Markup;
 using System.Linq;
 using CafeOrderManager.Models;
 using CafeOrderManager.Data;
@@ -33,7 +36,7 @@ namespace CafeOrderManager.Pages
                 Orders = new ObservableCollection<Order>(orders);
                 OrdersListView.ItemsSource = Orders;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при загрузке заказов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
@@ -50,7 +53,7 @@ namespace CafeOrderManager.Pages
                     await _context.SaveChangesAsync();
                     LoadOrders();
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка при создании заказа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
@@ -61,16 +64,122 @@ namespace CafeOrderManager.Pages
         {
             if (sender is FrameworkElement element && element.DataContext is Order order)
             {
-                var details = string.Join("\n", order.OrderItems.Select(item => 
-                    $"{item.MenuDish.Name} x{item.Quantity} = {item.Price * item.Quantity:N0} ₽"));
-                
-                var message = $"Заказ №{order.Id}\n" +
-                             $"Дата: {order.OrderDate:dd.MM.yyyy HH:mm}\n" +
-                             $"Статус: {order.Status}\n\n" +
-                             $"Позиции:\n{details}\n\n" +
-                             $"Итого: {order.TotalAmount:N0} ₽";
-                
-                MessageBox.Show(message, "Детали заказа", MessageBoxButton.OK, MessageBoxImage.Information);
+                var detailsWindow = new Window
+                {
+                    Title = $"Заказ №{order.Id}",
+                    Width = 400,
+                    Height = 500,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Owner = Window.GetWindow(this),
+                    Background = (System.Windows.Media.Brush)FindResource("MaterialDesignPaper"),
+                    Foreground = (System.Windows.Media.Brush)FindResource("MaterialDesignBody")
+                };
+
+                var mainGrid = new Grid { Margin = new Thickness(16) };
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                mainGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+                // Заголовок
+                var headerPanel = new StackPanel { Margin = new Thickness(0, 0, 0, 16) };
+                headerPanel.Children.Add(new TextBlock
+                {
+                    Text = $"Заказ №{order.Id}",
+                    Style = (Style)FindResource("MaterialDesignHeadline6TextBlock"),
+                    Margin = new Thickness(0, 0, 0, 8)
+                });
+                headerPanel.Children.Add(new TextBlock
+                {
+                    Text = $"Дата: {order.OrderDate:dd.MM.yyyy HH:mm}",
+                    Style = (Style)FindResource("MaterialDesignBody1TextBlock")
+                });
+                headerPanel.Children.Add(new TextBlock
+                {
+                    Text = $"Статус: {order.Status}",
+                    Style = (Style)FindResource("MaterialDesignBody1TextBlock")
+                });
+                Grid.SetRow(headerPanel, 0);
+
+                // Список позиций
+                var itemsListView = new ListView
+                {
+                    Margin = new Thickness(0, 0, 0, 16),
+                    Style = (Style)FindResource("MaterialDesignListView")
+                };
+
+                var gridView = new GridView();
+                gridView.Columns.Add(new GridViewColumn
+                {
+                    Header = "Название",
+                    DisplayMemberBinding = new Binding("MenuDish.Name"),
+                    Width = 150
+                });
+                gridView.Columns.Add(new GridViewColumn
+                {
+                    Header = "Кол-во",
+                    DisplayMemberBinding = new Binding("Quantity"),
+                    Width = 70
+                });
+
+                var priceColumn = new GridViewColumn
+                {
+                    Header = "Цена",
+                    Width = 100
+                };
+
+                var priceTemplate = new DataTemplate();
+                var priceTextBlock = new FrameworkElementFactory(typeof(TextBlock));
+                priceTextBlock.SetBinding(TextBlock.TextProperty, new Binding("Price") 
+                { 
+                    StringFormat = "{0:N0} ₽" 
+                });
+                priceTemplate.VisualTree = priceTextBlock;
+                priceColumn.CellTemplate = priceTemplate;
+                gridView.Columns.Add(priceColumn);
+
+                itemsListView.View = gridView;
+                itemsListView.ItemsSource = order.OrderItems;
+                Grid.SetRow(itemsListView, 1);
+
+                // Итого
+                var totalPanel = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Margin = new Thickness(0, 0, 0, 16)
+                };
+                totalPanel.Children.Add(new TextBlock
+                {
+                    Text = "Итого: ",
+                    Style = (Style)FindResource("MaterialDesignHeadline6TextBlock")
+                });
+                totalPanel.Children.Add(new TextBlock
+                {
+                    Text = $"{order.TotalAmount:N0} ₽",
+                    Style = (Style)FindResource("MaterialDesignHeadline6TextBlock")
+                });
+                Grid.SetRow(totalPanel, 2);
+
+                // Кнопка закрытия
+                var closeButton = new Button
+                {
+                    Content = "Закрыть",
+                    Style = (Style)FindResource("MaterialDesignFlatButton"),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Margin = new Thickness(0, 8, 0, 0)
+                };
+                closeButton.Click += (s, ev) => detailsWindow.Close();
+                Grid.SetRow(closeButton, 3);
+
+                mainGrid.Children.Add(headerPanel);
+                mainGrid.Children.Add(itemsListView);
+                mainGrid.Children.Add(totalPanel);
+                mainGrid.Children.Add(closeButton);
+
+                detailsWindow.Content = mainGrid;
+                detailsWindow.ShowDialog();
             }
         }
 
@@ -95,7 +204,7 @@ namespace CafeOrderManager.Pages
                             LoadOrders();
                         }
                     }
-                    catch (System.Exception ex)
+                    catch (Exception ex)
                     {
                         MessageBox.Show($"Ошибка при удалении заказа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                     }

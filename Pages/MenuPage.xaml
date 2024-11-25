@@ -32,9 +32,13 @@
                     <GridViewColumn Header="Описание" 
                                   DisplayMemberBinding="{Binding Description}" 
                                   Width="300"/>
-                    <GridViewColumn Header="Цена" 
-                                  DisplayMemberBinding="{Binding Price, StringFormat={}{0:C}}" 
-                                  Width="100"/>
+                    <GridViewColumn Header="Цена" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Price, StringFormat={}{0:N0} ₽}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Категория" 
                                   DisplayMemberBinding="{Binding Category}" 
                                   Width="150"/>

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Создать заказ" 
+        Title="Детали заказа" 
         Height="600" 
         Width="800"
         WindowStartupLocation="CenterOwner"
@@ -24,7 +24,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
+        
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
@@ -37,63 +37,77 @@
                   Style="{StaticResource MaterialDesignGroupBox}"
                   materialDesign:ColorZoneAssist.Mode="PrimaryLight"
                   Margin="0,0,8,0">
-            <ListView x:Name="MenuItemsListView" 
-                      SelectionMode="Single">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Название" 
-                                      DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="Цена" 
-                                      DisplayMemberBinding="{Binding Price, StringFormat={}{0:N0} ₽}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <DockPanel>
+                <ListView x:Name="MenuItemsListView" 
+                         DockPanel.Dock="Top">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Name}" Width="150"/>
+                            <GridViewColumn Header="Цена" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Price, StringFormat={}{0:N0} ₽}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
         </GroupBox>
 
         <!-- Кнопки управления -->
         <StackPanel Grid.Row="1" Grid.Column="1" 
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Center" 
                     Margin="8">
-            <Button x:Name="AddToOrderButton"
+            <Button Content="Добавить →"
                     Click="AddToOrderButton_Click"
-                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
-                    Margin="0,0,0,8">
-                <materialDesign:PackIcon Kind="ArrowRight"/>
-            </Button>
-            <Button x:Name="RemoveFromOrderButton"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Margin="0,0,0,8"/>
+            <Button Content="← Удалить"
                     Click="RemoveFromOrderButton_Click"
-                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}">
-                <materialDesign:PackIcon Kind="ArrowLeft"/>
-            </Button>
+                    Style="{StaticResource MaterialDesignRaisedButton}"/>
         </StackPanel>
 
-        <!-- Заказ -->
+        <!-- Текущий заказ -->
         <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                  Header="Заказ"
+                  Header="Текущий заказ"
                   Style="{StaticResource MaterialDesignGroupBox}"
-                  materialDesign:ColorZoneAssist.Mode="PrimaryLight"
+                  materialDesign:ColorZoneAssist.Mode="SecondaryLight"
                   Margin="8,0,0,0">
-            <ListView x:Name="OrderItemsListView"
-                      SelectionMode="Single">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Название" 
-                                      DisplayMemberBinding="{Binding MenuDish.Name}"/>
-                        <GridViewColumn Header="Кол-во" 
-                                      DisplayMemberBinding="{Binding Quantity}"/>
-                        <GridViewColumn Header="Цена" 
-                                      DisplayMemberBinding="{Binding Price, StringFormat={}{0:N0} ₽}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+            <DockPanel>
+                <ListView x:Name="OrderItemsListView" 
+                         DockPanel.Dock="Top">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding MenuDish.Name}" Width="150"/>
+                            <GridViewColumn Header="Количество" DisplayMemberBinding="{Binding Quantity}" Width="80"/>
+                            <GridViewColumn Header="Цена" Width="100">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Price, StringFormat={}{0:N0} ₽}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DockPanel>
         </GroupBox>
 
-        <!-- Итого -->
-        <TextBlock Grid.Row="2" Grid.Column="2"
-                   Text="{Binding Order.TotalAmount, StringFormat=Итого: {0:N0} ₽}"
-                   Style="{StaticResource MaterialDesignHeadline6TextBlock}"
-                   HorizontalAlignment="Right"
-                   Margin="0,16,0,16"/>
+        <!-- Итоговая сумма -->
+        <StackPanel Grid.Row="2" Grid.Column="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="0,16,0,16">
+            <TextBlock Text="Итого: " 
+                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                       VerticalAlignment="Center"/>
+            <TextBlock x:Name="TotalAmountText"
+                       Text="{Binding TotalAmount, StringFormat={}{0:N0} ₽}"
+                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
 
         <!-- Кнопки действий -->
         <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" 
@@ -101,11 +115,11 @@
                     HorizontalAlignment="Right">
             <Button Content="Отмена"
                     Click="CancelButton_Click"
-                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"
+                    Style="{StaticResource MaterialDesignFlatButton}"
                     Margin="0,0,8,0"/>
-            <Button Content="Создать"
+            <Button Content="Создать заказ"
                     Click="CreateButton_Click"
-                    Style="{StaticResource MaterialDesignRaisedSecondaryButton}"/>
+                    Style="{StaticResource MaterialDesignRaisedButton}"/>
         </StackPanel>
     </Grid>
 </Window>
