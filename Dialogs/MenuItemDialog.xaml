@@ -5,65 +5,64 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="Блюдо" Height="450" Width="400"
-        WindowStartupLocation="CenterOwner">
-    
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        x:Name="ThisWindow"
+        Title="Блюдо" Height="500" Width="400"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource MaterialDesignPaper}"
+        Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto">
 
-        <TextBox Grid.Row="0"
-                 materialDesign:HintAssist.Hint="Название"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                 Text="{Binding Name}"
-                 Margin="0,8"/>
-
-        <TextBox Grid.Row="1"
-                 materialDesign:HintAssist.Hint="Описание"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                 Text="{Binding Description}"
-                 TextWrapping="Wrap"
-                 AcceptsReturn="True"
-                 Height="100"
-                 Margin="0,8"/>
-
-        <TextBox Grid.Row="2"
-                 materialDesign:HintAssist.Hint="Цена"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                 Text="{Binding Price}"
-                 Margin="0,8"/>
-
-        <TextBox Grid.Row="3"
-                 materialDesign:HintAssist.Hint="Категория"
-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                 Text="{Binding Category}"
-                 Margin="0,8"/>
-
-        <CheckBox Grid.Row="4"
-                  Content="Доступно"
-                  IsChecked="{Binding IsAvailable}"
-                  Style="{StaticResource MaterialDesignCheckBox}"
-                  Margin="0,16"/>
-
-        <StackPanel Grid.Row="6" 
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Bottom" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Right" 
                     Margin="0,16,0,0">
             <Button Content="Отмена"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
                     Click="CancelButton_Click"
                     Margin="0,0,8,0"/>
             <Button Content="Сохранить"
-                    Style="{StaticResource MaterialDesignRaisedButton}"
                     Click="SaveButton_Click"/>
         </StackPanel>
-    </Grid>
+
+        <StackPanel>
+            <TextBox x:Name="NameTextBox"
+                     materialDesign:HintAssist.Hint="Название"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     Text="{Binding ElementName=ThisWindow, Path=DishName, UpdateSourceTrigger=PropertyChanged}"
+                     Margin="0,8"/>
+
+            <TextBox x:Name="DescriptionTextBox"
+                     materialDesign:HintAssist.Hint="Описание"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     Text="{Binding ElementName=ThisWindow, Path=DishDescription, UpdateSourceTrigger=PropertyChanged}"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     Height="100"
+                     Margin="0,8"/>
+
+            <TextBox x:Name="PriceTextBox"
+                     materialDesign:HintAssist.Hint="Цена"
+                     Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                     Text="{Binding ElementName=ThisWindow, Path=DishPrice, UpdateSourceTrigger=PropertyChanged, StringFormat=N2}"
+                     PreviewTextInput="PriceTextBox_PreviewTextInput"
+                     Margin="0,8"/>
+
+            <ComboBox x:Name="CategoryComboBox"
+                      materialDesign:HintAssist.Hint="Категория"
+                      Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                      ItemsSource="{Binding ElementName=ThisWindow, Path=Categories}"
+                      SelectedItem="{Binding ElementName=ThisWindow, Path=DishCategory, UpdateSourceTrigger=PropertyChanged}"
+                      Margin="0,8"/>
+
+            <CheckBox x:Name="IsAvailableCheckBox"
+                      Content="Доступно"
+                      IsChecked="{Binding ElementName=ThisWindow, Path=DishIsAvailable, UpdateSourceTrigger=PropertyChanged}"
+                      Style="{StaticResource MaterialDesignCheckBox}"
+                      Margin="0,16"/>
+        </StackPanel>
+    </DockPanel>
 </Window>

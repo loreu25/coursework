@@ -1,0 +1,309 @@
+warning: in the working copy of 'Dialogs/MenuItemDialog.xaml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Dialogs/MenuItemDialog.xaml.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Dialogs/OrderDialog.xaml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Dialogs/OrderDialog.xaml.cs', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/Dialogs/MenuItemDialog.xaml b/Dialogs/MenuItemDialog.xaml[m
+[1mindex 34cd0d5..58ad3e3 100644[m
+[1m--- a/Dialogs/MenuItemDialog.xaml[m
+[1m+++ b/Dialogs/MenuItemDialog.xaml[m
+[36m@@ -5,7 +5,9 @@[m
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"[m
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"[m
+         mc:Ignorable="d"[m
+[31m-        Title="Блюдо" Height="450" Width="400"[m
+[32m+[m[32m        Title="Блюдо"[m[41m [m
+[32m+[m[32m        Height="450"[m[41m [m
+[32m+[m[32m        Width="400"[m
+         WindowStartupLocation="CenterOwner">[m
+     [m
+     <Grid Margin="16">[m
+[36m@@ -19,51 +21,59 @@[m
+             <RowDefinition Height="Auto"/>[m
+         </Grid.RowDefinitions>[m
+ [m
+[31m-        <TextBox Grid.Row="0"[m
+[32m+[m[32m        <TextBox x:Name="NameTextBox"[m
+[32m+[m[32m                 Grid.Row="0"[m
+[32m+[m[32m                 Margin="0,0,0,16"[m
+                  materialDesign:HintAssist.Hint="Название"[m
+[31m-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"[m
+[31m-                 Text="{Binding Name}"[m
+[31m-                 Margin="0,8"/>[m
+[32m+[m[32m                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>[m
+ [m
+[31m-        <TextBox Grid.Row="1"[m
+[32m+[m[32m        <TextBox x:Name="DescriptionTextBox"[m
+[32m+[m[32m                 Grid.Row="1"[m
+[32m+[m[32m                 Margin="0,0,0,16"[m
+                  materialDesign:HintAssist.Hint="Описание"[m
+[31m-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"[m
+[31m-                 Text="{Binding Description}"[m
+[31m-                 TextWrapping="Wrap"[m
+[32m+[m[32m                 Style="{StaticResource MaterialDesignOutlinedTextBox}"[m
+                  AcceptsReturn="True"[m
+[31m-                 Height="100"[m
+[31m-                 Margin="0,8"/>[m
+[32m+[m[32m                 TextWrapping="Wrap"[m
+[32m+[m[32m                 VerticalScrollBarVisibility="Auto"[m
+[32m+[m[32m                 Height="100"/>[m
+ [m
+[31m-        <TextBox Grid.Row="2"[m
+[32m+[m[32m        <TextBox x:Name="PriceTextBox"[m
+[32m+[m[32m                 Grid.Row="2"[m
+[32m+[m[32m                 Margin="0,0,0,16"[m
+                  materialDesign:HintAssist.Hint="Цена"[m
+[31m-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"[m
+[31m-                 Text="{Binding Price}"[m
+[31m-                 Margin="0,8"/>[m
+[32m+[m[32m                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>[m
+ [m
+[31m-        <TextBox Grid.Row="3"[m
+[31m-                 materialDesign:HintAssist.Hint="Категория"[m
+[31m-                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"[m
+[31m-                 Text="{Binding Category}"[m
+[31m-                 Margin="0,8"/>[m
+[32m+[m[32m        <ComboBox x:Name="CategoryComboBox"[m
+[32m+[m[32m                  Grid.Row="3"[m
+[32m+[m[32m                  Margin="0,0,0,16"[m
+[32m+[m[32m                  materialDesign:HintAssist.Hint="Категория"[m
+[32m+[m[32m                  Style="{StaticResource MaterialDesignOutlinedComboBox}"[m
+[32m+[m[32m                  IsEditable="True">[m
+[32m+[m[32m            <ComboBoxItem>Горячие блюда</ComboBoxItem>[m
+[32m+[m[32m            <ComboBoxItem>Салаты</ComboBoxItem>[m
+[32m+[m[32m            <ComboBoxItem>Супы</ComboBoxItem>[m
+[32m+[m[32m            <ComboBoxItem>Закуски</ComboBoxItem>[m
+[32m+[m[32m            <ComboBoxItem>Десерты</ComboBoxItem>[m
+[32m+[m[32m            <ComboBoxItem>Напитки</ComboBoxItem>[m
+[32m+[m[32m        </ComboBox>[m
+ [m
+[31m-        <CheckBox Grid.Row="4"[m
+[32m+[m[32m        <CheckBox x:Name="IsAvailableCheckBox"[m
+[32m+[m[32m                  Grid.Row="4"[m
+[32m+[m[32m                  Margin="0,0,0,16"[m
+                   Content="Доступно"[m
+[31m-                  IsChecked="{Binding IsAvailable}"[m
+[31m-                  Style="{StaticResource MaterialDesignCheckBox}"[m
+[31m-                  Margin="0,16"/>[m
+[32m+[m[32m                  IsChecked="True"[m
+[32m+[m[32m                  Style="{StaticResource MaterialDesignCheckBox}"/>[m
+ [m
+         <StackPanel Grid.Row="6" [m
+                     Orientation="Horizontal" [m
+[31m-                    HorizontalAlignment="Right" [m
+[31m-                    Margin="0,16,0,0">[m
+[32m+[m[32m                    HorizontalAlignment="Right">[m
+             <Button Content="Отмена"[m
+[31m-                    Style="{StaticResource MaterialDesignFlatButton}"[m
+[31m-                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"[m
+                     Click="CancelButton_Click"[m
+[32m+[m[32m                    Style="{StaticResource MaterialDesignFlatButton}"[m
+                     Margin="0,0,8,0"/>[m
+             <Button Content="Сохранить"[m
+[31m-                    Style="{StaticResource MaterialDesignRaisedButton}"[m
+[31m-                    Click="SaveButton_Click"/>[m
+[32m+[m[32m                    Click="SaveButton_Click"[m
+[32m+[m[32m                    Style="{StaticResource MaterialDesignRaisedButton}"/>[m
+         </StackPanel>[m
+     </Grid>[m
+ </Window>[m
+[1mdiff --git a/Dialogs/MenuItemDialog.xaml.cs b/Dialogs/MenuItemDialog.xaml.cs[m
+[1mindex 0a4b319..558b94d 100644[m
+[1m--- a/Dialogs/MenuItemDialog.xaml.cs[m
+[1m+++ b/Dialogs/MenuItemDialog.xaml.cs[m
+[36m@@ -1,3 +1,4 @@[m
+[32m+[m[32musing System;[m
+ using System.Windows;[m
+ using CafeOrderManager.Models;[m
+ [m
+[36m@@ -10,24 +11,49 @@[m [mnamespace CafeOrderManager[m
+         public MenuItemDialog(MenuDish menuDish = null)[m
+         {[m
+             InitializeComponent();[m
+[31m-            MenuDish = menuDish ?? new MenuDish { IsAvailable = true };[m
+[31m-            DataContext = MenuDish;[m
+[32m+[m[41m            [m
+[32m+[m[32m            if (menuDish != null)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                MenuDish = menuDish;[m
+[32m+[m[32m                NameTextBox.Text = menuDish.Name;[m
+[32m+[m[32m                DescriptionTextBox.Text = menuDish.Description;[m
+[32m+[m[32m                PriceTextBox.Text = menuDish.Price.ToString();[m
+[32m+[m[32m                CategoryComboBox.Text = menuDish.Category;[m
+[32m+[m[32m                IsAvailableCheckBox.IsChecked = menuDish.IsAvailable;[m
+[32m+[m[32m            }[m
+         }[m
+ [m
+         private void SaveButton_Click(object sender, RoutedEventArgs e)[m
+         {[m
+[31m-            if (string.IsNullOrWhiteSpace(MenuDish.Name))[m
+[32m+[m[32m            if (string.IsNullOrWhiteSpace(NameTextBox.Text))[m
+[32m+[m[32m            {[m
+[32m+[m[32m                MessageBox.Show("Введите название блюда", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);[m
+[32m+[m[32m                return;[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            if (string.IsNullOrWhiteSpace(CategoryComboBox.Text))[m
+             {[m
+[31m-                MessageBox.Show("Пожалуйста, введите название блюда", "Ошибка");[m
+[32m+[m[32m                MessageBox.Show("Выберите или введите категорию", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);[m
+                 return;[m
+             }[m
+ [m
+[31m-            if (MenuDish.Price <= 0)[m
+[32m+[m[32m            if (!decimal.TryParse(PriceTextBox.Text, out decimal price) || price <= 0)[m
+             {[m
+[31m-                MessageBox.Show("Пожалуйста, введите корректную цену", "Ошибка");[m
+[32m+[m[32m                MessageBox.Show("Введите корректную цену", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);[m
+                 return;[m
+             }[m
+ [m
+[32m+[m[32m            if (MenuDish == null)[m
+[32m+[m[32m            {[m
+[32m+[m[32m                MenuDish = new MenuDish();[m
+[32m+[m[32m            }[m
+[32m+[m
+[32m+[m[32m            MenuDish.Name = NameTextBox.Text.Trim();[m
+[32m+[m[32m            MenuDish.Description = DescriptionTextBox.Text?.Trim();[m
+[32m+[m[32m            MenuDish.Price = price;[m
+[32m+[m[32m            MenuDish.Category = CategoryComboBox.Text.Trim();[m
+[32m+[m[32m            MenuDish.IsAvailable = IsAvailableCheckBox.IsChecked ?? true;[m
+[32m+[m
+             DialogResult = true;[m
+             Close();[m
+         }[m
+[1mdiff --git a/Dialogs/OrderDialog.xaml b/Dialogs/OrderDialog.xaml[m
+[1mindex 7e91b97..4e572c0 100644[m
+[1m--- a/Dialogs/OrderDialog.xaml[m
+[1m+++ b/Dialogs/OrderDialog.xaml[m
+[36m@@ -5,26 +5,12 @@[m
+         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"[m
+         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"[m
+         mc:Ignorable="d"[m
+[31m-        Title="Детали заказа" [m
+[32m+[m[32m        Title="Создание заказа"[m[41m [m
+         Height="600" [m
+[31m-        Width="800"[m
+[31m-        WindowStartupLocation="CenterOwner"[m
+[31m-        Background="{DynamicResource MaterialDesignPaper}"[m
+[31m-        Foreground="{DynamicResource MaterialDesignBody}"[m
+[31m-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"[m
+[31m-        TextElement.FontWeight="Regular"[m
+[31m-        TextElement.FontSize="13"[m
+[31m-        TextOptions.TextFormattingMode="Ideal"[m
+[31m-        TextOptions.TextRenderingMode="Auto">[m
+[31m-    [m
+[32m+[m[32m        Width="1000"[m
+[32m+[m[32m        WindowStartupLocation="CenterOwner">[m
+[32m+[m
+     <Grid Margin="16">[m
+[31m-        <Grid.RowDefinitions>[m
+[31m-            <RowDefinition Height="Auto"/>[m
+[31m-            <RowDefinition Height="*"/>[m
+[31m-            <RowDefinition Height="Auto"/>[m
+[31m-            <RowDefinition Height="Auto"/>[m
+[31m-        </Grid.RowDefinitions>[m
+[31m-        [m
+         <Grid.ColumnDefinitions>[m
+             <ColumnDefinition Width="*"/>[m
+             <ColumnDefinition Width="Auto"/>[m
+[36m@@ -32,34 +18,41 @@[m
+         </Grid.ColumnDefinitions>[m
+ [m
+         <!-- Меню -->[m
+[31m-        <GroupBox Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"[m
+[31m-                  Header="Меню"[m
+[31m-                  Style="{StaticResource MaterialDesignGroupBox}"[m
+[31m-                  materialDesign:ColorZoneAssist.Mode="PrimaryLight"[m
+[31m-                  Margin="0,0,8,0">[m
+[31m-            <DockPanel>[m
+[31m-                <ListView x:Name="MenuItemsListView" [m
+[31m-                         DockPanel.Dock="Top">[m
+[31m-                    <ListView.View>[m
+[31m-                        <GridView>[m
+[31m-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Name}" Width="150"/>[m
+[31m-                            <GridViewColumn Header="Цена" Width="100">[m
+[31m-                                <GridViewColumn.CellTemplate>[m
+[31m-                                    <DataTemplate>[m
+[31m-                                        <TextBlock Text="{Binding Price, StringFormat={}{0:N0} ₽}"/>[m
+[31m-                                    </DataTemplate>[m
+[31m-                                </GridViewColumn.CellTemplate>[m
+[31m-                            </GridViewColumn>[m
+[31m-                        </GridView>[m
+[31m-                    </ListView.View>[m
+[31m-                </ListView>[m
+[31m-            </DockPanel>[m
+[31m-        </GroupBox>[m
+[32m+[m[32m        <Grid Grid.Column="0">[m
+[32m+[m[32m            <Grid.RowDefinitions>[m
+[32m+[m[32m                <RowDefinition Height="Auto"/>[m
+[32m+[m[32m                <RowDefinition Height="Auto"/>[m
+[32m+[m[32m                <RowDefinition Height="*"/>[m
+[32m+[m[32m            </Grid.RowDefinitions>[m
+[32m+[m
+[32m+[m[32m            <TextBlock Grid.Row="0"[m
+[32m+[m[32m                       Text="Меню"[m
+[32m+[m[32m                       Style="{StaticResource MaterialDesignHeadline6TextBlock}"[m
+[32m+[m[32m                       Margin="0,0,0,16"/>[m
+[32m+[m
+[32m+[m[32m            <ComboBox x:Name="CategoryComboBox"[m
+[32m+[m[32m                      Grid.Row="1"[m
+[32m+[m[32m                      Margin="0,0,0,16"[m
+[32m+[m[32m                      SelectionChanged="CategoryComboBox_SelectionChanged"[m
+[32m+[m[32m                      materialDesign:HintAssist.Hint="Выберите категорию"[m
+[32m+[m[32m                      Style="{StaticResource MaterialDesignOutlinedComboBox}"/>[m
+[32m+[m
+[32m+[m[32m            <ListView x:Name="MenuItemsListView"[m
+[32m+[m[32m                      Grid.Row="2"[m
+[32m+[m[32m                      SelectionMode="Single">[m
+[32m+[m[32m                <ListView.View>[m
+[32m+[m[32m                    <GridView>[m
+[32m+[m[32m                        <GridViewColumn Header="Название" DisplayMemberBinding="{Binding Name}" Width="200"/>[m
+[32m+[m[32m                        <GridViewColumn Header="Цена" DisplayMemberBinding="{Binding Price, StringFormat={}{0:C}}" Width="100"/>[m
+[32m+[m[32m                    </GridView>[m
+[32m+[m[32m                </ListView.View>[m
+[32m+[m[32m            </ListView>[m
+[32m+[m[32m        </Grid>[m
+ [m
+         <!-- Кнопки управления -->[m
+[31m-        <StackPanel Grid.Row="1" Grid.Column="1" [m
+[31m-                    VerticalAlignment="Center" [m
+[31m-                    Margin="8">[m
+[32m+[m[32m        <StackPanel Grid.Column="1"[m[41m [m
+[32m+[m[32m                    Margin="16,0"[m
+[32m+[m[32m                    VerticalAlignment="Center">[m
+             <Button Content="Добавить →"[m
+                     Click="AddToOrderButton_Click"[m
+                     Style="{StaticResource MaterialDesignRaisedButton}"[m
+[36m@@ -70,56 +63,51 @@[m
+         </StackPanel>[m
+ [m
+         <!-- Текущий заказ -->[m
+[31m-        <GroupBox Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"[m
+[31m-                  Header="Текущий заказ"[m
+[31m-                  Style="{StaticResource MaterialDesignGroupBox}"[m
+[31m-                  materialDesign:ColorZoneAssist.Mode="SecondaryLight"[m
+[31m-                  Margin="8,0,0,0">[m
+[31m-            <DockPanel>[m
+[31m-                <ListView x:Name="OrderItemsListView" [m
+[31m-                         DockPanel.Dock="Top">[m
+[31m-                    <ListView.View>[m
+[31m-                        <GridView>[m
+[31m-                            <GridViewColumn Header="Название" DisplayMemberBinding="{Binding MenuDish.Name}" Width="150"/>[m
+[31m-                            <GridViewColumn Header="Количество" DisplayMemberBinding="{Binding Quantity}" Width="80"/>[m
+[31m-                            <GridViewColumn Header="Цена" Width="100">[m
+[31m-                                <GridViewColumn.CellTemplate>[m
+[31m-                                    <DataTemplate>[m
+[31m-                                        <TextBlock Text="{Binding Price, StringFormat={}{0:N0} ₽}"/>[m
+[31m-                                    </DataTemplate>[m
+[31m-                                </GridViewColumn.CellTemplate>[m
+[31m-                            </GridViewColumn>[m
+[31m-                        </GridView>[m
+[31m-                    </ListView.View>[m
+[31m-                </ListView>[m
+[31m-            </DockPanel>[m
+[31m-        </GroupBox>[m
+[32m+[m[32m        <Grid Grid.Column="2">[m
+[32m+[m[32m            <Grid.RowDefinitions>[m
+[32m+[m[32m                <RowDefinition Height="Auto"/>[m
+[32m+[m[32m                <RowDefinition Height="*"/>[m
+[32m+[m[32m                <RowDefinition Height
