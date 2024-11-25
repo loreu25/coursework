@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET7_0;NETCOREAPP
 C:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\ai\App.xaml
-4-487055084
+5-1386738895
 
-111128627068
+12-37563066
 2191150393206
-Dialogs\MenuItemDialog.xaml;MainWindow.xaml;Pages\MenuPage.xaml;Pages\OrdersPage.xaml;
+Dialogs\MenuItemDialog.xaml;Dialogs\OrderDialog.xaml;MainWindow.xaml;Pages\MenuPage.xaml;Pages\OrdersPage.xaml;
 
 False
 

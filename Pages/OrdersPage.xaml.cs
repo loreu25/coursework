@@ -23,35 +23,83 @@ namespace CafeOrderManager
 
         private void LoadOrders()
         {
-            Orders = new ObservableCollection<Order>(
-                _context.Orders
+            try
+            {
+                var orders = _context.Orders
                     .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.MenuDish)
-                    .ToList());
+                    .OrderByDescending(o => o.OrderDate)
+                    .ToList();
+                Orders = new ObservableCollection<Order>(orders);
+                OrdersListView.ItemsSource = Orders;
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Ошибка при загрузке заказов: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private void AddOrder_Click(object sender, RoutedEventArgs e)
+        private async void AddOrder_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Implement new order dialog
-            MessageBox.Show("Функционал добавления заказа будет реализован в следующем обновлении");
+            var dialog = new OrderDialog(_context);
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    _context.Orders.Add(dialog.Order);
+                    await _context.SaveChangesAsync();
+                    LoadOrders();
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при создании заказа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         private void ViewOrder_Click(object sender, RoutedEventArgs e)
         {
-            var order = ((FrameworkElement)sender).DataContext as Order;
-            // TODO: Implement order details dialog
-            MessageBox.Show($"Детали заказа №{order.Id} будут доступны в следующем обновлении");
+            if (sender is FrameworkElement element && element.DataContext is Order order)
+            {
+                var details = string.Join("\n", order.OrderItems.Select(item => 
+                    $"{item.MenuDish.Name} x{item.Quantity} = {item.Price * item.Quantity:C}"));
+                
+                var message = $"Заказ №{order.Id}\n" +
+                             $"Дата: {order.OrderDate:dd.MM.yyyy HH:mm}\n" +
+                             $"Статус: {order.Status}\n\n" +
+                             $"Позиции:\n{details}\n\n" +
+                             $"Итого: {order.TotalAmount:C}";
+                
+                MessageBox.Show(message, "Детали заказа", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private async void DeleteOrder_Click(object sender, RoutedEventArgs e)
         {
-            var order = ((FrameworkElement)sender).DataContext as Order;
-            if (MessageBox.Show("Вы уверены, что хотите удалить этот заказ?", "Подтверждение",
-                MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (sender is FrameworkElement element && element.DataContext is Order order)
             {
-                _context.Orders.Remove(order);
-                await _context.SaveChangesAsync();
-                LoadOrders();
+                if (MessageBox.Show("Вы уверены, что хотите удалить этот заказ?", "Подтверждение",
+                    MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        var orderToDelete = await _context.Orders
+                            .Include(o => o.OrderItems)
+                            .FirstOrDefaultAsync(o => o.Id == order.Id);
+
+                        if (orderToDelete != null)
+                        {
+                            _context.OrderItems.RemoveRange(orderToDelete.OrderItems);
+                            _context.Orders.Remove(orderToDelete);
+                            await _context.SaveChangesAsync();
+                            LoadOrders();
+                        }
+                    }
+                    catch (System.Exception ex)
+                    {
+                        MessageBox.Show($"Ошибка при удалении заказа: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
             }
         }
     }

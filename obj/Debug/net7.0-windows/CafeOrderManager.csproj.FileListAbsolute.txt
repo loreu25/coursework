@@ -74,3 +74,5 @@ c:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\ai\obj\Debu
 c:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\ai\bin\Debug\net7.0-windows\Humanizer.dll
 c:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\ai\bin\Debug\net7.0-windows\Microsoft.EntityFrameworkCore.Design.dll
 c:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\ai\bin\Debug\net7.0-windows\Mono.TextTemplating.dll
+C:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\ai\obj\Debug\net7.0-windows\Dialogs\OrderDialog.baml
+C:\Users\Никита\Desktop\Лабы\3 семестр\Курсач\ai\obj\Debug\net7.0-windows\Dialogs\OrderDialog.g.cs
