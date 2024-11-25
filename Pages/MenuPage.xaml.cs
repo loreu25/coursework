@@ -7,6 +7,7 @@ using CafeOrderManager.Models;
 using CafeOrderManager.Data;
 using Microsoft.EntityFrameworkCore;
 using MaterialDesignThemes.Wpf;
+using System.Windows.Input;
 using System.Diagnostics;
 
 namespace CafeOrderManager.Pages
@@ -16,10 +17,17 @@ namespace CafeOrderManager.Pages
         private readonly DatabaseContext _context;
         public ObservableCollection<MenuDish> MenuItems { get; set; }
 
+        public ICommand EditCommand { get; private set; }
+        public ICommand DeleteCommand { get; private set; }
+
         public MenuPage()
         {
             InitializeComponent();
             _context = new DatabaseContext();
+            
+            EditCommand = new RelayCommand(EditMenuItem);
+            DeleteCommand = new RelayCommand(DeleteMenuItem);
+            
             LoadMenuItems();
             DataContext = this;
         }
@@ -77,11 +85,11 @@ namespace CafeOrderManager.Pages
             }
         }
 
-        private void EditMenuItem_Click(object sender, RoutedEventArgs e)
+        private void EditMenuItem(object parameter)
         {
-            if (MenuItemsListView.SelectedItem is MenuDish selectedItem)
+            if (parameter is MenuDish selectedItem)
             {
-                Debug.WriteLine($"EditMenuItem_Click - selectedItem.Name: '{selectedItem.Name}'");
+                Debug.WriteLine($"EditMenuItem - selectedItem.Name: '{selectedItem.Name}'");
                 
                 var menuItem = new MenuDish
                 {
@@ -118,9 +126,9 @@ namespace CafeOrderManager.Pages
             }
         }
 
-        private void DeleteMenuItem_Click(object sender, RoutedEventArgs e)
+        private void DeleteMenuItem(object parameter)
         {
-            if (MenuItemsListView.SelectedItem is MenuDish selectedItem)
+            if (parameter is MenuDish selectedItem)
             {
                 var result = MessageBox.Show("Вы уверены, что хотите удалить это блюдо?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (result == MessageBoxResult.Yes)
@@ -137,6 +145,34 @@ namespace CafeOrderManager.Pages
                     }
                 }
             }
+        }
+    }
+
+    public class RelayCommand : ICommand
+    {
+        private readonly Action<object> _execute;
+        private readonly Func<object, bool> _canExecute;
+
+        public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+        {
+            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+            _canExecute = canExecute;
+        }
+
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
+        public bool CanExecute(object parameter)
+        {
+            return _canExecute == null || _canExecute(parameter);
+        }
+
+        public void Execute(object parameter)
+        {
+            _execute(parameter);
         }
     }
 }

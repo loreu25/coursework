@@ -47,11 +47,13 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <Button Content="Изменить" 
-                                            Click="EditMenuItem_Click"
+                                            Command="{Binding DataContext.EditCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                            CommandParameter="{Binding}"
                                             Style="{StaticResource MaterialDesignFlatButton}"
                                             Margin="0,0,8,0"/>
                                     <Button Content="Удалить" 
-                                            Click="DeleteMenuItem_Click"
+                                            Command="{Binding DataContext.DeleteCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                            CommandParameter="{Binding}"
                                             Style="{StaticResource MaterialDesignFlatButton}"/>
                                 </StackPanel>
                             </DataTemplate>
